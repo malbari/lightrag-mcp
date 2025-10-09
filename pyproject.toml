@@ -27,6 +27,7 @@ dev = [
 
 [project.scripts]
 lightrag-mcp = "lightrag_mcp.main:main"
+lightrag_mcp = "lightrag_mcp.main:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/lightrag_mcp"]
