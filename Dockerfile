@@ -53,7 +53,7 @@ COPY --from=uv /app /app
 # Variabili d'ambiente
 ENV PATH="/root/.local/bin:/app/.venv/bin:$PATH"
 ENV MCP_PROXY_HOST="0.0.0.0"
-ENV MCP_PROXY_PORT="8082"
+ENV MCP_PROXY_PORT="8092"
 ENV LIGHTRAG_API_HOST="localhost"
 ENV LIGHTRAG_API_PORT="9621"
 
