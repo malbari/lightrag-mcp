@@ -77,7 +77,12 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
         logger.info("LightRAG MCP Server stopped")
 
 
-mcp = FastMCP("LightRAG MCP Server", lifespan=app_lifespan)
+mcp = FastMCP(
+    "LightRAG MCP Server",
+    lifespan=app_lifespan,
+    host=config.MCP_HOST,
+    port=config.MCP_PORT,
+)
 
 
 async def execute_lightrag_operation(

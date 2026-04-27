@@ -36,15 +36,24 @@ uv pip install -e .
 
 ## Usage
 
-**Important**: LightRAG MCP server should only be run as an MCP server through an MCP client configuration file (mcp-config.json).
+The server exposes a **Streamable HTTP** MCP endpoint at `http://<host>:<port>/mcp` (default port: `8092`).
 
-### Command Line Options
+### Command Line Options (LightRAG API connection)
 
-The following arguments are available when configuring the server in mcp-config.json:
+The following arguments configure the connection to the LightRAG API backend. They can also be set via environment variables:
 
-- `--host`: LightRAG API host (default: localhost)
-- `--port`: LightRAG API port (default: 9621)
-- `--api-key`: LightRAG API key (optional)
+| Argument | Env var | Default | Description |
+|---|---|---|---|
+| `--host` | `LIGHTRAG_API_HOST` | `localhost` | LightRAG API host |
+| `--port` | `LIGHTRAG_API_PORT` | `9621` | LightRAG API port |
+| `--api-key` | `LIGHTRAG_API_KEY` | *(none)* | LightRAG API key |
+
+The MCP HTTP server port is controlled exclusively by environment variables:
+
+| Env var | Default | Description |
+|---|---|---|
+| `MCP_HOST` | `0.0.0.0` | Bind address for the MCP HTTP server |
+| `MCP_PORT` | `8092` | Port for the MCP HTTP server |
 
 ### Integration with LightRAG API
 
@@ -61,56 +70,58 @@ uv pip install -r LightRAG/lightrag/api/requirements.txt
 uv run LightRAG/lightrag/api/lightrag_server.py --host localhost --port 9621 --working-dir ./rag_storage --input-dir ./input --llm-binding openai --embedding-binding openai --log-level DEBUG
 ```
 
-### Setting up as MCP server
+### Running with Docker
 
-To set up LightRAG MCP as an MCP server, add the following configuration to your MCP client configuration file (e.g., `mcp-config.json`):
+```bash
+# Build the image
+./build-image.sh
 
-#### Using uvenv (uvx):
+# Start the container
+./start.sh
+
+# The MCP endpoint is available at:
+# http://localhost:8092/mcp
+```
+
+You can override the defaults at runtime:
+
+```bash
+docker run -d --restart unless-stopped \
+  --add-host=host.docker.internal:host-gateway \
+  -p 8092:8092 --name lightrag-mcp \
+  -e LIGHTRAG_API_HOST="host.docker.internal" \
+  -e LIGHTRAG_API_PORT=9621 \
+  -e LIGHTRAG_API_KEY="your_api_key" \
+  -e MCP_PORT=8092 \
+  lightrag-mcp
+```
+
+### Connecting an MCP client
+
+Configure your MCP client (e.g., VS Code Copilot, Claude Desktop) with the HTTP transport:
 
 ```json
 {
   "mcpServers": {
     "lightrag-mcp": {
-      "command": "uvx",
-      "args": [
-        "lightrag_mcp",
-        "--host",
-        "localhost",
-        "--port",
-        "9621",
-        "--api-key",
-        "your_api_key"
-      ]
+      "type": "http",
+      "url": "http://localhost:8092/mcp"
     }
   }
 }
 ```
 
-#### Development
+#### Development (local run without Docker)
 
-```json
-{
-  "mcpServers": {
-    "lightrag-mcp": {
-      "command": "uv",
-      "args": [
-        "--directory",
-        "/path/to/lightrag_mcp",
-        "run",
-        "src/lightrag_mcp/main.py",
-        "--host",
-        "localhost",
-        "--port",
-        "9621",
-        "--api-key",
-        "your_api_key"
-      ]
-    }
-  }
-}
+```bash
+# Install dependencies
+uv pip install -e .
+
+# Start the server
+lightrag-mcp --host localhost --port 9621
 ```
 
-Replace `/path/to/lightrag_mcp` with the actual path to your lightrag-mcp directory.
+Then connect your MCP client to `http://localhost:8092/mcp`.
 
 ## Available MCP Tools
 

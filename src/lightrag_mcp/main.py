@@ -28,12 +28,13 @@ def main():
         logger.info(
             f"LightRAG API server is expected to be already running and available at: {config.LIGHTRAG_API_BASE_URL}"
         )
+        logger.info(f"MCP HTTP server listening on {config.MCP_HOST}:{config.MCP_PORT}/mcp")
         if config.LIGHTRAG_API_KEY:
             logger.info("API key is configured")
         else:
             logger.warning("No API key provided")
 
-        mcp.run(transport="stdio")
+        mcp.run(transport="streamable-http")
 
     except KeyboardInterrupt:
         logger.info("Server stopped by user")
