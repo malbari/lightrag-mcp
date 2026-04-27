@@ -82,6 +82,7 @@ mcp = FastMCP(
     lifespan=app_lifespan,
     host=config.MCP_HOST,
     port=config.MCP_PORT,
+    stateless_http=True,
 )
 
 
